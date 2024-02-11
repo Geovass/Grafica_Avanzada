@@ -143,6 +143,9 @@ float rotHelHelY = 0.0;
 int stateDoor = 0;
 float dorRotCount = 0.0;
 
+float avance = 0.1f;
+float giroEclipse = 0.5f;
+
 double deltaTime;
 double currTime, lastTime;
 
@@ -993,6 +996,69 @@ void applicationLoop() {
 		skyboxSphere.render();
 		glCullFace(oldCullFaceMode);
 		glDepthFunc(oldDepthFuncMode);
+
+		/******* Maquina de estados *******/
+		switch(state){
+			case 0:
+				if(numberAdvance == 0)
+					maxAdvance = 65.0;
+				if(numberAdvance == 1)
+					maxAdvance = 49.0;
+				if(numberAdvance == 2)
+					maxAdvance = 44.5;
+				if(numberAdvance == 3)
+					maxAdvance = 49.0;
+				if(numberAdvance == 4)
+					maxAdvance = 44.5;
+					state = 1;
+				break;
+			case 1:
+				modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(0.0f, 0.0f, avance));
+				advanceCount += avance;
+				rotWheelsX += 0.5;
+				rotWheelsY -= 0.2;
+				if (rotWheelsY < 0.0)
+					rotWheelsY = 0.0;
+				if(advanceCount > maxAdvance){
+					advanceCount = 0;
+					numberAdvance ++;
+					state = 2;
+				}
+				break;
+			case 2:
+				modelMatrixEclipse = glm::translate(modelMatrixEclipse, glm::vec3(0.0f, 0.0f, 0.025f));
+				modelMatrixEclipse = glm::rotate(modelMatrixEclipse, glm::radians(giroEclipse), glm::vec3(0, 1, 0));
+				rotCount += giroEclipse;
+				rotWheelsX += 0.005;
+				rotWheelsY += 0.02;
+				if(rotWheelsY >= 0.25)
+					rotWheelsY = 0.25;
+				if(rotCount >= 90.0){
+					state = 0;
+					rotCount = 0;
+					if(numberAdvance > 4)
+						numberAdvance = 1;
+				}
+				break;
+			default:
+				break; 
+		}
+
+		/******* Maquina de estados Lambo *******/
+		switch(stateDoor){
+			case 0:
+				dorRotCount += 0.6;
+				if(dorRotCount > 75.0)
+					stateDoor = 1;
+				break;
+			case 1:
+				dorRotCount -= 0.6;
+				if(dorRotCount < 0)
+					stateDoor = 0;
+				break;
+			default:
+				break;
+		}
 
 		// Constantes de animaciones
 		rotHelHelY += 0.5;
