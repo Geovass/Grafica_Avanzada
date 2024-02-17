@@ -55,7 +55,10 @@ Box boxCesped;
 Box boxWalls;
 Box boxHighway;
 Box boxLandingPad;
-Sphere esfera1(10, 10);
+
+// Sphere
+Sphere esfera1(20, 20);
+
 // Models complex instances
 Model modelRock;
 Model modelAircraft;
@@ -85,7 +88,7 @@ Model modelDartLegoRightLeg;
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
 
-GLenum types[6] = {
+GLenum types[6] = { 	
 GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
@@ -231,6 +234,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	boxLandingPad.init();
 	boxLandingPad.setShader(&shaderMulLighting);
 
+	/********************************************
+	 *  Esfera 1
+	*********************************************/
 	esfera1.init();
 	esfera1.setShader(&shaderMulLighting);
 
@@ -844,6 +850,7 @@ void applicationLoop() {
 		esfera1.setScale(glm::vec3(3.0, 3.0, 3.0));
 		esfera1.setPosition(glm::vec3(3.0f, 2.0f, -10.0f));
 		esfera1.render();
+		
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureWallID);
@@ -853,7 +860,7 @@ void applicationLoop() {
 		esfera1.enableWireMode();
 		esfera1.render();
 		esfera1.enableFillMode();
-
+		
 		/******************************************
 		 * Landing pad
 		*******************************************/
