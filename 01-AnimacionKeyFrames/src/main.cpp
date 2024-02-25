@@ -720,9 +720,9 @@ void applicationLoop() {
 	modelMatrixWitch = glm::scale (modelMatrixWitch, glm::vec3(5.0f, 5.0f, 5.0f));
 
 	// Variables to interpolation key frames
-	fileName = "../animaciones/animation_dart_joints.txt";
+	fileName = "../animaciones/geovanniR_dart_joints.txt";
 	keyFramesDartJoints = getKeyRotFrames(fileName);
-	keyFramesDart = getKeyFrames("../animaciones/animation_dart.txt");
+	keyFramesDart = getKeyFrames("../animaciones/geovanniR_dart.txt");
 
 	lastTime = TimeManager::Instance().GetTime();
 
