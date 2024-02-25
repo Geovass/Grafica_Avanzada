@@ -83,6 +83,11 @@ Model modelDartLegoRightHand;
 Model modelDartLegoLeftLeg;
 Model modelDartLegoRightLeg;
 
+// Modelo Alien
+Model modelAlien;
+// Modelo Bruja
+Model modelWitch;
+
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
 
@@ -112,13 +117,17 @@ glm::mat4 modelMatrixHeli = glm::mat4(1.0f);
 glm::mat4 modelMatrixLambo = glm::mat4(1.0);
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
+// Modelo Alien & Witch
+glm::mat4 modelMatrixAlien = glm::mat4(1.0f);
+glm::mat4 modelMatrixWitch = glm::mat4(1.0f);
+
 
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 int modelSelected = 0;
 bool enableCountSelected = true;
 
 // Variables to animations keyframes
-bool saveFrame = false, availableSave = true;
+bool saveFrame = false, availableSave = true;	
 std::ofstream myfile;
 std::string fileName = "";
 bool record = false;
@@ -294,6 +303,13 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelDartLegoLeftLeg.setShader(&shaderMulLighting);
 	modelDartLegoRightLeg.loadModel("../models/LegoDart/LeoDart_right_leg.obj");
 	modelDartLegoRightLeg.setShader(&shaderMulLighting);
+
+	//Modelo Alien & Witch
+	modelAlien.loadModel("../models/Alien/Alien.obj");
+	modelAlien.setShader(&shaderMulLighting);
+	modelWitch.loadModel("../models/Witch/witch_cartooni.obj");
+	modelWitch.setShader(&shaderMulLighting);
+
 
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
 	
@@ -502,6 +518,10 @@ void destroy() {
 	modelLamboRightDor.destroy();
 	modelRock.destroy();
 
+	//Model Alien & Witch
+	modelAlien.destroy();
+	modelWitch.destroy();
+
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDeleteTextures(1, &textureCespedID);
@@ -690,6 +710,14 @@ void applicationLoop() {
 	modelMatrixLambo = glm::translate(modelMatrixLambo, glm::vec3(23.0, 0.0, 0.0));
 
 	modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(3.0, 0.0, 20.0));
+
+	// Model Alien & Witch
+	modelMatrixAlien = glm::translate(modelMatrixAlien, glm::vec3(-2.0f, 0.0f, 20.0f));
+	modelMatrixAlien = glm::rotate(modelMatrixAlien, glm::radians(90.0f), glm::vec3(0, 1, 0));
+
+	modelMatrixWitch = glm::translate(modelMatrixWitch, glm::vec3(-45.0f, 1.0f, 10.0f));
+	modelMatrixWitch = glm::rotate(modelMatrixWitch, glm::radians(45.0f), glm::vec3(0, 1, 0));
+	modelMatrixWitch = glm::scale (modelMatrixWitch, glm::vec3(5.0f, 5.0f, 5.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -992,6 +1020,10 @@ void applicationLoop() {
 		modelDartLegoRightLeg.render(modelMatrixDartRightLeg);
 		// Se regresa el cull faces IMPORTANTE para la capa
 		glEnable(GL_CULL_FACE);
+
+		// Render Alien & Witch
+		modelAlien.render(modelMatrixAlien);
+		modelWitch.render(modelMatrixWitch);
 
 		/*******************************************
 		 * Skybox
