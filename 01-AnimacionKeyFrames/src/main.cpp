@@ -712,6 +712,11 @@ void applicationLoop() {
 	int lamboMaxAdv = 0.0;
 	int cont = 0;
 	
+	// Variables para el helicoptero
+	int stateHeli = 0;
+	float heliAdvance = 5.0;
+	float landing = 0.0;
+
 
 	matrixModelRock = glm::translate(matrixModelRock, glm::vec3(-3.0, 0.0, 2.0));
 
@@ -963,56 +968,41 @@ void applicationLoop() {
 
 		// Lambo car
 		glDisable(GL_CULL_FACE);
-		/*glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
-		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
-		modelLambo.render(modelMatrixLamboChasis);
-		glActiveTexture(GL_TEXTURE0);
-		glm::mat4 modelMatrixLamboLeftDor = glm::mat4(modelMatrixLamboChasis);
-		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(1.08685, 0.714829, 0.980795));
-		modelMatrixLamboLeftDor = glm::rotate(modelMatrixLamboLeftDor, glm::radians(dorRotCount), glm::vec3(1.0, 0, 0));
-		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(-1.08685, -0.714829, -0.980795));
-		modelLamboLeftDor.render(modelMatrixLamboLeftDor);
-		modelLamboRightDor.render(modelMatrixLamboChasis);
-		modelLamboFrontLeftWheel.render(modelMatrixLamboChasis);
-		modelLamboFrontRightWheel.render(modelMatrixLamboChasis);
-		modelLamboRearLeftWheel.render(modelMatrixLamboChasis);
-		modelLamboRearRightWheel.render(modelMatrixLamboChasis);*/
-
 		glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
 		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
 		modelLambo.render(modelMatrixLamboChasis);
 		glActiveTexture(GL_TEXTURE0);
-		//Matrices para las 4 llantas pegadas al chasis
+		// Matrices para las ruedas
 		glm::mat4 modelMatrixLamboFrontLeftWheel = glm::mat4(modelMatrixLamboChasis);
 		glm::mat4 modelMatrixLamboFrontRightWheel = glm::mat4(modelMatrixLamboChasis);
 		glm::mat4 modelMatrixLamboRearLeftWheel = glm::mat4(modelMatrixLamboChasis);
 		glm::mat4 modelMatrixLamboRearRightWheel = glm::mat4(modelMatrixLamboChasis);
-		//Transformaciones para cada pivote  
-		//Rueda izquierda delantera
+		// Transformaciones para cada pivote  
+		// Rueda delantera izquierda
 		modelMatrixLamboFrontLeftWheel = glm::translate(modelMatrixLamboFrontLeftWheel, glm::vec3(0.93, 0.3791, 1.399));
 		modelMatrixLamboFrontLeftWheel = glm::rotate(modelMatrixLamboFrontLeftWheel, lamboRotWheelsY, glm::vec3(0, 1, 0));
 		modelMatrixLamboFrontLeftWheel = glm::rotate(modelMatrixLamboFrontLeftWheel, lamboRotWheelsX, glm::vec3(1, 0, 0));
 		modelMatrixLamboFrontLeftWheel = glm::translate(modelMatrixLamboFrontLeftWheel, glm::vec3(-0.93, -0.3791, -1.399));
 		modelLamboFrontLeftWheel.render(modelMatrixLamboFrontLeftWheel);
-		//Rueda derecha delantera
+		// Rueda delantera derecha
 		modelMatrixLamboFrontRightWheel = glm::translate(modelMatrixLamboFrontRightWheel, glm::vec3(-0.93, 0.3791, 1.399));
 		modelMatrixLamboFrontRightWheel = glm::rotate(modelMatrixLamboFrontRightWheel, lamboRotWheelsY, glm::vec3(0, 1, 0));
 		modelMatrixLamboFrontRightWheel = glm::rotate(modelMatrixLamboFrontRightWheel, lamboRotWheelsX, glm::vec3(1, 0, 0));
 		modelMatrixLamboFrontRightWheel = glm::translate(modelMatrixLamboFrontRightWheel, glm::vec3(0.93, -0.3791, -1.399));
 		modelLamboFrontRightWheel.render(modelMatrixLamboFrontRightWheel);
-		//Rueda izquierda trasera
+		// Rueda trasera izquierda
 		modelMatrixLamboRearLeftWheel = glm::translate(modelMatrixLamboRearLeftWheel, glm::vec3(0.93, 0.3991,-1.6));
 		modelMatrixLamboRearLeftWheel = glm::rotate(modelMatrixLamboRearLeftWheel, lamboRotWheelsY, glm::vec3(0, 1, 0));
 		modelMatrixLamboRearLeftWheel = glm::rotate(modelMatrixLamboRearLeftWheel, lamboRotWheelsX, glm::vec3(1, 0, 0));
 		modelMatrixLamboRearLeftWheel = glm::translate(modelMatrixLamboRearLeftWheel, glm::vec3(-0.93, -0.3991,1.6));
 		modelLamboRearLeftWheel.render(modelMatrixLamboRearLeftWheel);
-		//Rueda derecha trasera
+		// Rueda trasera derecha
 		modelMatrixLamboRearRightWheel = glm::translate(modelMatrixLamboRearRightWheel, glm::vec3(-0.93, 0.3991,-1.6));
 		modelMatrixLamboRearRightWheel = glm::rotate(modelMatrixLamboRearRightWheel, lamboRotWheelsY, glm::vec3(0, 1, 0));
 		modelMatrixLamboRearRightWheel = glm::rotate(modelMatrixLamboRearRightWheel, lamboRotWheelsX, glm::vec3(1, 0, 0));
 		modelMatrixLamboRearRightWheel = glm::translate(modelMatrixLamboRearRightWheel, glm::vec3(0.93, -0.3991,1.6));
 		modelLamboRearRightWheel.render(modelMatrixLamboRearRightWheel);
-		//Transformaciones de las puertas
+		// Puertas
 		glm::mat4 modelMatrixLamboLeftDor = glm::mat4(modelMatrixLamboChasis);
 		modelMatrixLamboLeftDor = glm::translate(modelMatrixLamboLeftDor, glm::vec3(1.08676, 0.707316, 0.982601));
 		modelMatrixLamboLeftDor = glm::rotate(modelMatrixLamboLeftDor, glm::radians(dorRotCount), glm::vec3(1.0, 0, 0));
@@ -1201,7 +1191,7 @@ void applicationLoop() {
 		}
 
 		/******* Maquina de estados Lambo *******/
-		switch (stateLambo) {
+		switch (stateLambo){
 			case 0:
 				if (lamboNumberAdv == 0)
 					lamboMaxAdv = 5.0f;
@@ -1264,8 +1254,35 @@ void applicationLoop() {
 				break;
 		}
 
-		// Constantes de animaciones
-		rotHelHelY += 0.5;
+		/******* Maquina de estados Helicoptero *******/
+		switch (stateHeli){
+			case 0:
+				modelMatrixHeli = glm::translate(modelMatrixHeli, glm::vec3(0.0f,-0.01f, 0.0f));
+				landing += 0.01;
+				if(landing < 6.85)
+					rotHelHelY += 0.3;
+				if(landing >= 6.85)
+					rotHelHelY += 0.2;
+
+				if(landing > 9.7){
+					landing = 0.0;
+					stateHeli = 1;
+				}
+				break;
+			case 1:
+				heliAdvance += 0.5;
+				rotHelHelY += 0.05;
+				if(heliAdvance > 15.0){
+					heliAdvance = 0.0;
+					stateHeli = 2;
+				}
+				break;
+			case 2:
+				rotHelHelY = 0.0;
+				break;
+			default:
+				break;
+		}
 
 		glfwSwapBuffers(window);
 	}
