@@ -814,6 +814,7 @@ void applicationLoop() {
 	modelMatrixCowboy = glm::translate(modelMatrixCowboy, glm::vec3(20.0, 0.03, -15.0));
 
 	modelMatrixBob = glm::translate(modelMatrixBob, glm::vec3(20.0, 0.9, -5.0));
+	//modelMatrixBob = glm::rotate(modelMatrixBob, modelBob, glm::radians(0.0, 0.0, 1.0));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
