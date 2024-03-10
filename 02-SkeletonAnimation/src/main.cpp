@@ -96,6 +96,9 @@ Model modelMayow;
 Model modelCowboy;
 Model modelBob;
 
+// Modelo dragon
+Model modelDragon;
+
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
@@ -108,12 +111,12 @@ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
 
-std::string fileNames[6] = { "../Textures/mp_bloodvalley/blood-valley_ft.tga",
-		"../Textures/mp_bloodvalley/blood-valley_bk.tga",
-		"../Textures/mp_bloodvalley/blood-valley_up.tga",
-		"../Textures/mp_bloodvalley/blood-valley_dn.tga",
-		"../Textures/mp_bloodvalley/blood-valley_rt.tga",
-		"../Textures/mp_bloodvalley/blood-valley_lf.tga" };
+std::string fileNames[6] = { "../Textures/open_field/open_field_px.png",
+		"../Textures/open_field/open_field_nx.png",
+		"../Textures/open_field/open_field_py.png",
+		"../Textures/open_field/open_field_ny.png",
+		"../Textures/open_field/open_field_pz.png",
+		"../Textures/open_field/open_field_nz.png" };
 
 bool exitApp = false;
 int lastMousePosX, offsetX = 0;
@@ -134,6 +137,10 @@ glm::mat4 modelMatrixMayow = glm::mat4(1.0f);
 glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixBob = glm::mat4(1.0f);
 
+// Modelo dragon
+glm::mat4 modelMatrixDragon = glm::mat4(1.0f);
+
+int animationDragonIndex = 0;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 float rotBuzzHead = 0.0, rotBuzzLeftarm = 0.0, rotBuzzLeftForeArm = 0.0, rotBuzzLeftHand = 0.0;
 int modelSelected = 0;
@@ -355,6 +362,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelBob.loadModel("../models/boblampclean/boblampclean.md5mesh");
 	modelBob.setShader(&shaderMulLighting);
 
+	// Modelo dragon
+	modelDragon.loadModel("../models/dragon/dragonAnimated.fbx");
+	modelDragon.setShader(&shaderMulLighting);
+
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
 	
 	// Carga de texturas para el skybox
@@ -573,6 +584,9 @@ void destroy() {
 	modelCowboy.destroy();
 	modelBob.destroy();
 
+	// Modelo dragon
+	modelDragon.destroy();
+
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDeleteTextures(1, &textureCespedID);
@@ -777,6 +791,23 @@ bool processInput(bool continueApplication) {
 	else if (modelSelected == 2 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, -0.02));
 
+	// Controles del dragon
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+		modelMatrixDragon = glm::rotate(modelMatrixDragon, 0.02f, glm::vec3(0, 1, 0));
+		animationDragonIndex = 1;
+	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+		modelMatrixDragon = glm::rotate(modelMatrixDragon, -0.02f, glm::vec3(0, 1, 0));
+		animationDragonIndex = 1;
+	}
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+		modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(0.0, 0.0, 0.02));
+		animationDragonIndex = 1;
+	}
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+		modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(0.0, 0.0, -0.02));
+		animationDragonIndex = 1;
+	}
+
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -815,6 +846,9 @@ void applicationLoop() {
 
 	modelMatrixBob = glm::translate(modelMatrixBob, glm::vec3(20.0, 0.9, -5.0));
 	//modelMatrixBob = glm::rotate(modelMatrixBob, modelBob, glm::radians(0.0, 0.0, 1.0));
+
+	// Modelo dragon
+	modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(-5.0f, 0.0f, 20.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1166,6 +1200,13 @@ void applicationLoop() {
 		glm::mat4 modelMatrixBobBody = glm::mat4(modelMatrixBob);
 		modelMatrixBobBody = glm::scale(modelMatrixBobBody, glm::vec3(0.06f));
 		modelBob.render(modelMatrixBobBody);
+
+		// Modelo dragon
+		glm::mat4 modelMatrixDragonBody = glm::mat4(modelMatrixDragon);
+		modelMatrixDragonBody = glm::scale(modelMatrixDragonBody, glm::vec3(0.007f));
+		modelDragon.setAnimationIndex(animationDragonIndex);
+		modelDragon.render(modelMatrixDragonBody);
+		animationDragonIndex = 0;
 
 		/*******************************************
 		 * Skybox
