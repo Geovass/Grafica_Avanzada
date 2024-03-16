@@ -105,7 +105,7 @@ Model cyborgModelAnimate;
 Model modelDragon;
 
 // Terrain
-Terrain terreno(-1, -1, 120, 16, "../Textures/terrenoGeo.png");
+Terrain terreno(-1, -1, 120, 16, "../Textures/terrenoP3.png");
 
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
