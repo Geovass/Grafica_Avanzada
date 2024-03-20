@@ -1053,7 +1053,7 @@ void applicationLoop() {
 		shaderMulLighting.setFloat("spotLights[0].constant", 1.0);
 		shaderMulLighting.setFloat("spotLights[0].lineal", 0.07);
 		shaderMulLighting.setFloat("spotLights[0].quadratic", 0.03);
-		shaderMulLighting.setFloat("spotLights[0].cutOff", cos(glm::radians(15.0f)));
+		shaderMulLighting.setFloat("spotLights[0].cutOff", cos(glm::radians(12.5f)));
 		shaderMulLighting.setFloat("spotLights[0].outerCutOff", cos(glm::radians(15.0f)));
 
 		shaderTerrain.setVectorFloat3("spotLights[0].light.ambient", glm::value_ptr(glm::vec3(0.0, 0.0, 0.0)));
@@ -1064,7 +1064,7 @@ void applicationLoop() {
 		shaderTerrain.setFloat("spotLights[0].constant", 1.0);
 		shaderTerrain.setFloat("spotLights[0].lineal", 0.07);
 		shaderTerrain.setFloat("spotLights[0].quadratic", 0.03);
-		shaderTerrain.setFloat("spotLights[0].cutOff", cos(glm::radians(15.0f)));
+		shaderTerrain.setFloat("spotLights[0].cutOff", cos(glm::radians(12.5f)));
 		shaderTerrain.setFloat("spotLights[0].outerCutOff", cos(glm::radians(15.0f)));
 
 

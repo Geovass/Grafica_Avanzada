@@ -57,6 +57,7 @@ Box boxCesped;
 Box boxWalls;
 Box boxHighway;
 Box boxLandingPad;
+Box caja;
 Sphere esfera1(10, 10);
 // Models complex instances
 Model modelRock;
@@ -89,7 +90,7 @@ Model modelDartLegoRightLeg;
 Model modelFrog;
 Model modelDragon;
 
-GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
+GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID, textureSpongeID, textureWaterID;
 GLuint skyboxTextureID;
 
 GLenum types[6] = {
@@ -248,6 +249,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 
 	esfera1.init();
 	esfera1.setShader(&shaderMulLightingMt);
+
+	caja.init();
+	caja.setShader(&shaderMulLightingMt);
 
 	modelRock.loadModel("../models/rock/rock.obj");
 	modelRock.setShader(&shaderMulLighting);
@@ -454,6 +458,44 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	// Libera la memoria de la textura
 	textureHighway.freeImage();
 
+// Definiendo la textura de la esponja
+	Texture textureSponge("../Textures/alfaSponge.jpg");
+	textureSponge.loadImage(); // Cargar la textura
+	glGenTextures(1, &textureSpongeID); // Creando el id de la textura de la esponja
+	glBindTexture(GL_TEXTURE_2D, textureSpongeID); // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if(textureSponge.getData()){
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, textureSponge.getChannels() == 3 ? GL_RGB : GL_RGBA, textureSponge.getWidth(), textureSponge.getHeight(), 0,
+		textureSponge.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureSponge.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else 
+		std::cout << "Fallo la carga de textura" << std::endl;
+	textureSponge.freeImage(); // Liberamos memoria
+
+// Definiendo la textura del agua 
+	Texture textureWater("../Textures/alfaWater.jpg");
+	textureWater.loadImage(); // Cargar la textura
+	glGenTextures(1, &textureWaterID); // Creando el id de la textura del agua
+	glBindTexture(GL_TEXTURE_2D, textureWaterID); // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if(textureWater.getData()){
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, textureWater.getChannels() == 3 ? GL_RGB : GL_RGBA, textureWater.getWidth(), textureWater.getHeight(), 0,
+		textureWater.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureWater.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else 
+		std::cout << "Fallo la carga de textura" << std::endl;
+	textureWater.freeImage(); // Liberamos memoria
+
 	// Definiendo la textura
 	Texture textureLandingPad("../Textures/landingPad.jpg");
 	textureLandingPad.loadImage(); // Cargar la textura
@@ -494,6 +536,7 @@ void destroy() {
 	boxHighway.destroy();
 	boxLandingPad.destroy();
 	esfera1.destroy();
+	caja.destroy();
 
 	// Custom objects Delete
 	modelAircraft.destroy();
@@ -937,6 +980,20 @@ void applicationLoop() {
 		esfera1.enableWireMode();
 		esfera1.render();
 		esfera1.enableFillMode();
+
+		/*******************************************
+		 Texturizado del cubo
+		*********************************************/
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureWaterID);
+		shaderMulLightingMt.setInt("texture1", 0);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D,textureSpongeID);
+		shaderMulLightingMt.setInt("texture2", 3);
+		caja.setScale(glm::vec3(3.0, 3.0, 3.0));
+		caja.setPosition(glm::vec3(13.0f, 2.0f, -10.0f));
+		caja.setOrientation(glm::vec3(0.0, 0.0, 0.0));
+		caja.render();
 
 		/******************************************
 		 * Landing pad
