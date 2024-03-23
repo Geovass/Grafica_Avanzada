@@ -104,7 +104,7 @@ Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
 // Terrain model instance
-Terrain terrain(-1, -1, 200, 8, "../Textures/blendMap2024_2.png");
+Terrain terrain(-1, -1, 120, 16, "../Textures/terrenoP3.png");
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint textureTerrainRID, textureTerrainGID, textureTerrainBID, textureTerrainBlendMapID;
@@ -399,7 +399,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	}
 
 	// Definiendo la textura a utilizar
-	Texture textureCesped("../Textures/grassy2.png");
+	Texture textureCesped("../Textures/p4concreto.jpg");
 	// Carga el mapa de bits (FIBITMAP es el tipo de dato de la libreria)
 	textureCesped.loadImage();
 	// Creando la textura con id 1
@@ -535,7 +535,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	textureLandingPad.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura del terreno roja
-	Texture textureR("../Textures/mud.png");
+	Texture textureR("../Textures/p4grava.jpg");
 	textureR.loadImage(); // Cargar la textura
 	glGenTextures(1, &textureTerrainRID); // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainRID); // Se enlaza la textura
@@ -554,7 +554,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	textureR.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura del terreno verde
-	Texture textureG("../Textures/grassFlowers.png");
+	Texture textureG("../Textures/p4tierra.png");
 	textureG.loadImage(); // Cargar la textura
 	glGenTextures(1, &textureTerrainGID); // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainGID); // Se enlaza la textura
@@ -573,7 +573,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	textureG.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura del terreno azul
-	Texture textureB("../Textures/path.png");
+	Texture textureB("../Textures/p4agua.jpg");
 	textureB.loadImage(); // Cargar la textura
 	glGenTextures(1, &textureTerrainBID); // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBID); // Se enlaza la textura
@@ -592,7 +592,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	textureB.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura del terreno blendmap
-	Texture textureBlendMap("../Textures/blendMap2024_2.png");
+	Texture textureBlendMap("../Textures/p4blendmap.png");
 	textureBlendMap.loadImage(); // Cargar la textura
 	glGenTextures(1, &textureTerrainBlendMapID); // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBlendMapID); // Se enlaza la textura
