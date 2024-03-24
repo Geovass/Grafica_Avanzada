@@ -103,6 +103,13 @@ Model cowboyModelAnimate;
 Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
+
+// Modelo dragon
+Model modelDragon;
+
+// Modelo caballero
+Model modelKnight;
+
 // Terrain model instance
 Terrain terrain(-1, -1, 120, 16, "../Textures/terrenoP3.png");
 
@@ -142,6 +149,19 @@ glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
 
+// Modelo dragon
+glm::mat4 modelMatrixDragon = glm::mat4(1.0f);
+
+// Modelo caballero
+glm::mat4 modelMatrixKnight = glm::mat4(1.0f);
+
+// Variables para el caballero
+int animationKnightIndex = 0;
+bool knightLoop = true;
+double knightTime;
+
+
+int animationDragonIndex = 0;
 int animationMayowIndex = 1;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 float rotBuzzHead = 0.0, rotBuzzLeftarm = 0.0, rotBuzzLeftForeArm = 0.0, rotBuzzLeftHand = 0.0;
@@ -369,6 +389,14 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	// Cyborg
 	cyborgModelAnimate.loadModel("../models/cyborg/cyborg.fbx");
 	cyborgModelAnimate.setShader(&shaderMulLighting);
+
+	// Modelo dragon
+	modelDragon.loadModel("../models/dragon/dragonAnimated.fbx");
+	modelDragon.setShader(&shaderMulLighting);
+
+	// Modelo caballero
+	modelKnight.loadModel("../models/knight/knightAnimated.fbx");
+	modelKnight.setShader(&shaderMulLighting);
 
 	// Terreno
 	terrain.init();
@@ -667,6 +695,12 @@ void destroy() {
 	guardianModelAnimate.destroy();
 	cyborgModelAnimate.destroy();
 
+	// Modelo dragon
+	modelDragon.destroy();
+
+	// Modelo dragon
+	modelKnight.destroy();
+
 	// Terrains objects Delete
 	terrain.destroy();
 
@@ -879,20 +913,42 @@ bool processInput(bool continueApplication) {
 		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, -0.02));
 
 	// Controles de mayow
-	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, 0.02f, glm::vec3(0, 1, 0));
 		animationMayowIndex = 0;
-	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+	} else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, -0.02f, glm::vec3(0, 1, 0));
 		animationMayowIndex = 0;
 	}
-	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
 		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, 0.02));
 		animationMayowIndex = 0;
 	}
-	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
 		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, -0.02));
 		animationMayowIndex = 0;
+	}
+
+	// Controles del dragon
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+		modelMatrixDragon = glm::rotate(modelMatrixDragon, 0.02f, glm::vec3(0, 1, 0));
+		animationDragonIndex = 1;
+	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+		modelMatrixDragon = glm::rotate(modelMatrixDragon, -0.02f, glm::vec3(0, 1, 0));
+		animationDragonIndex = 1;
+	}
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+		modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(0.0, 0.0, 0.02));
+		animationDragonIndex = 1;
+	}
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+		modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(0.0, 0.0, -0.02));
+		animationDragonIndex = 1;
+	}
+
+	if (modelSelected == 6 && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && knightLoop){
+		animationKnightIndex = animationKnightIndex? 0:1;
+		knightLoop = false;
 	}
 
 	glfwPollEvents();
@@ -933,6 +989,12 @@ void applicationLoop() {
 	modelMatrixGuardian = glm::rotate(modelMatrixGuardian, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 
 	modelMatrixCyborg = glm::translate(modelMatrixCyborg, glm::vec3(5.0f, 0.05, 0.0f));
+
+	// Modelo dragon
+	modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(-5.0f, 0.0f, 20.0f));
+
+	// Modelo caballero
+	modelMatrixKnight = glm::translate(modelMatrixKnight, glm::vec3(-5.0f, 0.0f, 30.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1233,6 +1295,41 @@ void applicationLoop() {
 		modelMatrixCyborgBody = glm::scale(modelMatrixCyborgBody, glm::vec3(0.009f));
 		cyborgModelAnimate.setAnimationIndex(1);
 		cyborgModelAnimate.render(modelMatrixCyborgBody);
+
+		/*****************************************
+		 * Dragon animado por huesos
+		 * **************************************/
+		glm::vec3 dragonNormal = terrain.getNormalTerrain(modelMatrixDragon[3][0], modelMatrixDragon[3][2]);
+		glm::vec3 dragonEjex = glm::vec3(modelMatrixDragon[0]);
+		glm::vec3 dragonEjez = glm::normalize(glm::cross(dragonEjex, dragonNormal));
+		dragonEjex = glm::normalize(glm::cross(dragonNormal, dragonEjez));
+		modelMatrixDragon[0] = glm::vec4(dragonEjex, 0.0);
+		modelMatrixDragon[1] = glm::vec4(dragonNormal, 0.0);
+		modelMatrixDragon[3][1] = terrain.getHeightTerrain(modelMatrixDragon[3][0], modelMatrixDragon[3][2]);
+		glm::mat4 modelMatrixDragonBody = glm::mat4(modelMatrixDragon);
+		modelMatrixDragonBody = glm::scale(modelMatrixDragonBody, glm::vec3(0.007f));
+		modelDragon.setAnimationIndex(animationDragonIndex);
+		modelDragon.render(modelMatrixDragonBody);
+		animationDragonIndex = 0;
+
+		/*****************************************
+		 * Caballero animado por huesos
+		 * **************************************/
+		glm::vec3 knightNormal = terrain.getNormalTerrain(modelMatrixKnight[3][0], modelMatrixKnight[3][2]);
+		glm::vec3 knightEjex = glm::vec3(modelMatrixKnight[0]);
+		glm::vec3 knightEjez = glm::normalize(glm::cross(knightEjex, knightNormal));
+		knightEjex = glm::normalize(glm::cross(knightNormal, knightEjez));
+		modelMatrixKnight[0] = glm::vec4(knightEjex, 0.0);
+		modelMatrixKnight[1] = glm::vec4(knightNormal, 0.0);
+		modelMatrixKnight[3][1] = terrain.getHeightTerrain(modelMatrixKnight[3][0], modelMatrixKnight[3][2]);
+		glm::mat4 modelMatrixKnightBody = glm::mat4(modelMatrixKnight);
+		modelMatrixKnightBody = glm::scale(modelMatrixKnightBody, glm::vec3(0.007f));
+		modelKnight.setAnimationIndex(animationKnightIndex);
+		modelKnight.render(modelMatrixKnightBody);
+		if(currTime - knightTime > 1.0){
+			knightTime = currTime;
+			knightLoop = true;
+		}
 
 		/*******************************************
 		 * Skybox
