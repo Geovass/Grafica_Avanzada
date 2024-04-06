@@ -39,6 +39,8 @@
 
 #include "Headers/AnimationUtils.h"
 
+#include "Headers/Colisiones.h"
+
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 
 int screenWidth;
@@ -56,6 +58,8 @@ Shader shaderTerrain;
 
 std::shared_ptr<Camera> camera(new ThirdPersonCamera());
 float distanceFromTarget = 7.0;
+
+Sphere sphereCollider(10, 10);
 
 Sphere skyboxSphere(20, 20);
 Box boxCesped;
@@ -223,6 +227,10 @@ float GRAVITY = 1.81;
 double tmv = 0;
 double startTimeJump = 0;
 
+// Mapa de Colliders
+std::map<std::string, std::tuple<AbstractModel::SBB, glm::mat4, glm::mat4>> collidersSBB;
+std::map<std::string, std::tuple<AbstractModel::OBB, glm::mat4, glm::mat4>> collidersOBB;
+
 // Variables animacion maquina de estados eclipse
 const float avance = 0.1;
 const float giroEclipse = 0.5f;
@@ -302,6 +310,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	skyboxSphere.init();
 	skyboxSphere.setShader(&shaderSkybox);
 	skyboxSphere.setScale(glm::vec3(20.0f, 20.0f, 20.0f));
+
+	// Sphere Collider
+	sphereCollider.init();
+	sphereCollider.setShader(&shader);
 
 	rayModel.init();
 	rayModel.setShader(&shader);
@@ -679,6 +691,7 @@ void destroy() {
 	boxHighway.destroy();
 	boxLandingPad.destroy();
 	esfera1.destroy();
+	sphereCollider.destroy();
 
 	// Custom objects Delete
 	modelAircraft.destroy();
@@ -1410,6 +1423,25 @@ void applicationLoop() {
 		skyboxSphere.render();
 		glCullFace(oldCullFaceMode);
 		glDepthFunc(oldDepthFuncMode);
+
+		// Creacion de Colliders
+		AbstractModel::SBB rockCollider;
+		glm::mat4 modelMatrixRockCollider = glm::mat4(matrixModelRock);
+		modelMatrixRockCollider = glm::scale(modelMatrixRockCollider, glm::vec3(1.0));
+		modelMatrixRockCollider = glm::translate(modelMatrixRockCollider, modelRock.getSbb().c);
+		rockCollider.c = modelMatrixRockCollider[3];
+		rockCollider.ratio = modelRock.getSbb().ratio;
+		addOrUpdateColliders(collidersSBB, "rock", rockCollider, matrixModelRock);
+
+		// Renders de Colliders
+		std::map<std::string, std::tuple<AbstractModel::SBB, glm::mat4, glm::mat4>>::iterator it;
+		for(it = collidersSBB.begin(); it != collidersSBB.end(); it++){
+			glm::mat4 matrixCollider = glm::mat4(1.0);
+			matrixCollider = glm::translate(matrixCollider, std::get<0>(it->second).c);
+			matrixCollider = glm::scale(matrixCollider, glm::vec3(std::get<0>(it->second).ratio * 2.0));
+			sphereCollider.setColor(glm::vec4(1.0));
+			sphereCollider.render();
+		}
 
 		// Ray mayor direction
 		glm::mat4 modelMatrixRay = glm::mat4(modelMatrixMayow);
