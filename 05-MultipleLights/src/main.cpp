@@ -1359,11 +1359,6 @@ void applicationLoop()
 		glDisable(GL_CULL_FACE);
 		glm::mat4 modelMatrixLamboChasis = glm::mat4(modelMatrixLambo);
 		modelMatrixLamboChasis = glm::scale(modelMatrixLamboChasis, glm::vec3(1.3, 1.3, 1.3));
-
-		// SECCION POR LLANTA DE MOVIMIENTO
-		// SECCION ORIGINAL CON CHASIS UNICAMENTE
-		// Movimiento de hueso
-		//  y = a la altura (posición en x, posición en z)
 		modelMatrixLamboChasis[3][1] = terrain.getHeightTerrain(modelMatrixLamboChasis[3][0], modelMatrixLamboChasis[3][2]);
 		glm::vec3 ejeyLambo = glm::normalize(terrain.getNormalTerrain(modelMatrixLamboChasis[3][0], modelMatrixLamboChasis[3][2]));
 		glm::vec3 ejezLambo = glm::normalize(modelMatrixLamboChasis[2]);

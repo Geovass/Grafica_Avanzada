@@ -54,8 +54,13 @@ Shader shaderMulLighting;
 //Shader para el terreno
 Shader shaderTerrain;
 
-//std::shared_ptr<FirstPersonCamera> camera(new FirstPersonCamera());
-std::shared_ptr<Camera> camera(new ThirdPersonCamera()); // Instancia de la camara en tercera persona
+std::shared_ptr<Camera> camera(new ThirdPersonCamera());
+std::shared_ptr<Camera> cameraDragon(new ThirdPersonCamera());
+std::shared_ptr<FirstPersonCamera> cameraOne(new FirstPersonCamera());
+//Variable para definir la distancia al objetivo:
+
+float distanceFromTargetDragon= 7.5;
+bool firstCamera = false;
 float distanceFromPlayer = 7.5;
 
 Sphere skyboxSphere(20, 20);
@@ -110,6 +115,10 @@ Model cowboyModelAnimate;
 Model guardianModelAnimate;
 // Cybog
 Model cyborgModelAnimate;
+
+// Modelo Dragon
+Model modelDragon;
+
 // Terrain model instance
 Terrain terrain(-1, -1, 200, 8, "../Textures/heightmap.png");
 
@@ -149,6 +158,10 @@ glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
 
+// Modelo dragon
+glm::mat4 modelMatrixDragon = glm::mat4(1.0f);
+
+int animationDragonIndex = 0;
 int animationMayowIndex = 1;
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 float rotBuzzHead = 0.0, rotBuzzLeftarm = 0.0, rotBuzzLeftForeArm = 0.0, rotBuzzLeftHand = 0.0;
@@ -405,13 +418,27 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	cyborgModelAnimate.loadModel("../models/cyborg/cyborg.fbx");
 	cyborgModelAnimate.setShader(&shaderMulLighting);
 
+	// Modelo dragon
+	modelDragon.loadModel("../models/dragon/dragonAnimated.fbx");
+	modelDragon.setShader(&shaderMulLighting);
+
 	// Terreno
 	terrain.init();
 	terrain.setShader(&shaderTerrain);
 
+	cameraOne->setPosition(glm::vec3(0.0, 3.0, 4.0));
+	cameraDragon->setPosition(glm::vec3(0.0, 3.0, 4.0));
+
 	//camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
-	camera->setDistanceFromTarget(distanceFromPlayer);
 	camera->setSensitivity(1.2);
+	camera->setDistanceFromTarget(distanceFromPlayer);
+	
+
+	//Camara del dragon
+	cameraDragon->setSensitivity(1.0f);
+	cameraDragon->setDistanceFromTarget(distanceFromTargetDragon);
+
+	
 	
 	// Carga de texturas para el skybox
 	Texture skyboxTexture = Texture("");
@@ -708,6 +735,9 @@ void destroy() {
 	guardianModelAnimate.destroy();
 	cyborgModelAnimate.destroy();
 
+	// Modelo dragon
+	modelDragon.destroy();
+
 	// Terrains objects Delete
 	terrain.destroy();
 
@@ -771,29 +801,46 @@ void mouseButtonCallback(GLFWwindow *window, int button, int state, int mod) {
 
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset){
 	distanceFromPlayer += yoffset;
+	distanceFromTargetDragon += yoffset;
 	camera->setDistanceFromTarget(distanceFromPlayer); 
+	cameraDragon->setDistanceFromTarget(distanceFromPlayer);
 }
 
 bool processInput(bool continueApplication) {
 	if (exitApp || glfwWindowShouldClose(window) != 0) {
 		return false;
+	}	
+	//Camara en primera persona y tercer POV
+	//SI FUNCIONA, SOLO QUE LEE MUY RAPIDO, POR LO QUE SE TIENE QUE PRESIONAR AMBAS TECLAS Y SOLTARLAS RAPIDO
+	if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS){
+		if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_K) == GLFW_RELEASE){
+			if (firstCamera == false){
+				firstCamera = true;
+			}else{
+				firstCamera = false;
+			}
+		}
 	}
-
-	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-		camera->mouseMoveCamera(offsetX, 0.0, deltaTime);
-	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-		camera->mouseMoveCamera(0.0, offsetY, deltaTime);
-
-	/*if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera->moveFrontCamera(true, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera->moveFrontCamera(false, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera->moveRightCamera(false, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera->moveRightCamera(true, deltaTime);
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-		camera->mouseMoveCamera(offsetX, offsetY, deltaTime);*/
+	if(firstCamera == true){
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			cameraOne->moveFrontCamera(true, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			cameraOne->moveFrontCamera(false, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			cameraOne->moveRightCamera(false, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			cameraOne->moveRightCamera(true, deltaTime);
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+			cameraOne->mouseMoveCamera(offsetX, offsetY, deltaTime);
+	}
+	if(firstCamera == false){
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)==GLFW_PRESS){
+			camera->mouseMoveCamera(offsetX, offsetY, deltaTime);
+			if (modelSelected == 2)
+				cameraDragon->mouseMoveCamera(offsetX, offsetY, deltaTime);
+		}
+	}
+	//Moimiento de la camara en 3era persona
 	offsetX = 0;
 	offsetY = 0;
 
@@ -801,7 +848,7 @@ bool processInput(bool continueApplication) {
 	if (enableCountSelected && glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS){
 		enableCountSelected = false;
 		modelSelected++;
-		if(modelSelected > 4)
+		if(modelSelected > 6)
 			modelSelected = 0;
 		if(modelSelected == 1)
 			fileName = "../animaciones/animation_dart_joints.txt";
@@ -930,20 +977,37 @@ bool processInput(bool continueApplication) {
 		modelMatrixBuzz = glm::translate(modelMatrixBuzz, glm::vec3(0.0, 0.0, -0.02));
 
 	// Controles de mayow
-	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, 0.02f, glm::vec3(0, 1, 0));
 		animationMayowIndex = 0;
-	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+	} else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, -0.02f, glm::vec3(0, 1, 0));
 		animationMayowIndex = 0;
 	}
-	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+	if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
 		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, 0.02));
 		animationMayowIndex = 0;
 	}
-	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+	else if (modelSelected == 5 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
 		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, -0.02));
 		animationMayowIndex = 0;
+	}
+
+	// Controles del dragon
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+		modelMatrixDragon = glm::rotate(modelMatrixDragon, 0.02f, glm::vec3(0, 1, 0));
+		animationDragonIndex = 1;
+	} else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+		modelMatrixDragon = glm::rotate(modelMatrixDragon, -0.02f, glm::vec3(0, 1, 0));
+		animationDragonIndex = 1;
+	}
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+		modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(0.0, 0.0, 0.02));
+		animationDragonIndex = 1;
+	}
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+		modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(0.0, 0.0, -0.02));
+		animationDragonIndex = 1;
 	}
 
 	glfwPollEvents();
@@ -989,6 +1053,9 @@ void applicationLoop() {
 
 	modelMatrixCyborg = glm::translate(modelMatrixCyborg, glm::vec3(5.0f, 0.05, 0.0f));
 
+	// Modelo dragon
+	modelMatrixDragon = glm::translate(modelMatrixDragon, glm::vec3(-5.0f, 0.0f, 20.0f));
+
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
 	keyFramesDartJoints = getKeyRotFrames(fileName);
@@ -1023,10 +1090,14 @@ void applicationLoop() {
 			playerPosition = modelMatrixDart[3];
 			axisPlayer = glm::axis(glm::quat_cast(modelMatrixDart));
 			anglePlayer = glm:: angle(glm::quat_cast(modelMatrixDart));
-		}else{
+		}else if(modelSelected == 5){
 			playerPosition = modelMatrixMayow[3];
 			axisPlayer = glm::axis(glm::quat_cast(modelMatrixMayow));
 			anglePlayer = glm:: angle(glm::quat_cast(modelMatrixMayow));
+		}else{
+			playerPosition = modelMatrixDragon[3];
+			axisPlayer = glm::axis(glm::quat_cast(modelMatrixDragon));
+			anglePlayer = glm:: angle(glm::quat_cast(modelMatrixDragon));
 		}
 		if(std::isnan(anglePlayer))
 			anglePlayer = 0.0;
@@ -1038,7 +1109,13 @@ void applicationLoop() {
 		camera->setAngleTarget(anglePlayer);
 		camera->updateCamera();
 		
-		glm::mat4 view = camera->getViewMatrix();
+		glm::mat4 view;
+		if(firstCamera){
+			view = cameraOne->getViewMatrix();
+		}
+		if(firstCamera == false){
+			view = camera->getViewMatrix();
+		}
 
 		// Settea la matriz de vista y projection al shader con solo color
 		shader.setMatrix4("projection", 1, false, glm::value_ptr(projection));
@@ -1379,6 +1456,23 @@ void applicationLoop() {
 		modelMatrixCyborgBody = glm::scale(modelMatrixCyborgBody, glm::vec3(0.009f));
 		cyborgModelAnimate.setAnimationIndex(1);
 		cyborgModelAnimate.render(modelMatrixCyborgBody);
+
+		/*****************************************
+		 * Dragon animado por huesos
+		 * **************************************/
+		glm::vec3 dragonNormal = terrain.getNormalTerrain(modelMatrixDragon[3][0], modelMatrixDragon[3][2]);
+		glm::vec3 dragonEjex = glm::vec3(modelMatrixDragon[0]);
+		glm::vec3 dragonEjez = glm::normalize(glm::cross(dragonEjex, dragonNormal));
+		dragonEjex = glm::normalize(glm::cross(dragonNormal, dragonEjez));
+		modelMatrixDragon[0] = glm::vec4(dragonEjex, 0.0);
+		modelMatrixDragon[1] = glm::vec4(dragonNormal, 0.0);
+		modelMatrixDragon[3][1] = terrain.getHeightTerrain(modelMatrixDragon[3][0], modelMatrixDragon[3][2]);
+		glm::mat4 modelMatrixDragonBody = glm::mat4(modelMatrixDragon);
+		modelMatrixDragonBody = glm::scale(modelMatrixDragonBody, glm::vec3(0.007f));
+		modelMatrixDragonBody = glm::rotate(modelMatrixDragonBody, glm::radians(180.0f), glm::vec3(0, 1, 0));
+		modelDragon.setAnimationIndex(animationDragonIndex);
+		modelDragon.render(modelMatrixDragonBody);
+		animationDragonIndex = 0;
 
 		/*******************************************
 		 * Skybox

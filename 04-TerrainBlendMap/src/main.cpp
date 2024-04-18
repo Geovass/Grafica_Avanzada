@@ -698,7 +698,7 @@ void destroy() {
 	// Modelo dragon
 	modelDragon.destroy();
 
-	// Modelo dragon
+	// Modelo caballero
 	modelKnight.destroy();
 
 	// Terrains objects Delete
