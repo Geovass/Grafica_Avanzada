@@ -1654,6 +1654,16 @@ void applicationLoop() {
 						1.0f), view, projection,
 					viewPort);
 		}
+		for(itOBB = collidersOBB.begin(); itOBB!=collidersOBB.end(); itOBB++){
+			if(testRayOBB(o, t, std::get<0>(itObb1->second))){
+				std::cout << "Seleccionando el modelo" << itOBB->first << std::endl;
+			}
+		}
+		for(itSBB2 = collidersSBB.begin(); itSBB2 != collidersSBB.end() && !isColision; itSBB2++){
+				if(itSBB1 != itSBB2 && testSphereSphereIntersection(std::get<0>(itSBB1->second), std::get<0>(itSBB2->second))){
+					std::cout <<"Seleccionando el modelo  " << itSBB1->first << std::endl;
+				}
+		}
 
 		/* Renders de Colliders */
 		std::map<std::string, std::tuple<AbstractModel::SBB, glm::mat4, glm::mat4>>::iterator it;
